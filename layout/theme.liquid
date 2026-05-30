@@ -31,6 +31,11 @@
   {{ 'theme.css' | asset_url | stylesheet_tag: preload: true }}
   {%- render 'css-variables' -%}
 
+  {%- comment -%} KANSAWALA design system (9.1.0 migration · Phase 1) — see BRAND.md {%- endcomment -%}
+  {{ 'kw-tokens.css'     | asset_url | stylesheet_tag }}
+  {{ 'kw-typography.css' | asset_url | stylesheet_tag }}
+  {%- render 'kw-fonts' -%}
+
   <script>
     document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
 

@@ -1,0 +1,30 @@
+{
+  "_comment": "Kansawala 9.1.0 migration registry. owner: custom = ported KW section, stock = untouched Impulse section. status: active = placed on a template, ready = built but not placed, pending = not yet ported. See MIGRATION-LOG.md.",
+  "sections": {
+    "hero-slider": { "owner": "custom", "status": "active", "placed_in": ["index"] },
+    "marquee-strip": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "collections-grid": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "global-presence": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "trust-numbers": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "heritage-timeline": { "owner": "custom", "status": "ready", "placed_in": [] }
+  },
+  "pending": [
+    "bestsellers",
+    "brand-story",
+    "b2b-trust",
+    "three-sacred-metals",
+    "customer-reviews",
+    "ayurveda",
+    "meaning-legacy",
+    "buy-back-promise",
+    "craft-process",
+    "kw-newsletter"
+  ],
+  "foundation": {
+    "assets/kw-tokens.css": "design tokens (:root) + reduced-motion floor",
+    "assets/kw-typography.css": ".t-* typography utilities (grows per section)",
+    "snippets/kw-fonts.liquid": "Jost + Cormorant Garamond (Google Fonts)",
+    "assets/theme.js": "theme.HeroSlider class + registration; fade-up reveal IIFE ([data-kw-fade-up]); trust-numbers count-up IIFE ([data-kw-trust-numbers])",
+    "layout/theme.liquid": "head wiring: kw-tokens, kw-typography, kw-fonts"
+  }
+}
