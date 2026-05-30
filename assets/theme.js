@@ -5862,7 +5862,290 @@ theme.recentlyViewed = {
   
     return SlideshowSection;
   })();
-  
+
+  /* KANSAWALA hero-slider (9.1.0 migration · Phase 1).
+     Native port of the 9.0.0 initHero engine: fade carousel via .active,
+     autoplay honoring prefers-reduced-motion, ARIA tablist dots with
+     roving tabindex (←→↑↓/Home/End), prev/next arrows, 40px touch swipe.
+     Section root carries data-section-type="hero-slider" + data-autoplay
+     + data-speed. See MIGRATION-LOG.md / COMPONENTS.md. */
+  theme.HeroSlider = (function() {
+
+    function HeroSlider(container) {
+      this.container = container;
+      this.slides = container.querySelectorAll('.slide');
+      this.dots = container.querySelectorAll('[data-hero-dot]');
+      this.total = this.slides.length;
+      this.cur = 0;
+      this.timer = null;
+      this.userPaused = false;
+      this.listeners = [];
+      this.autoplay = container.dataset.autoplay === 'true';
+      this.speed = (parseFloat(container.dataset.speed) || 5) * 1000;
+      this.reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (this.total === 0) { return; }
+
+      var sectionEl = container.parentElement;
+      var sectionIndex = [].indexOf.call(sectionEl.parentElement.children, sectionEl);
+
+      if (sectionIndex === 0) {
+        this.init();
+      } else {
+        theme.initWhenVisible({
+          element: this.container,
+          callback: this.init.bind(this)
+        });
+      }
+    }
+
+    HeroSlider.prototype = Object.assign({}, HeroSlider.prototype, {
+      init: function() {
+        if (this._booted) { return; }
+        this._booted = true;
+
+        var _this = this;
+
+        this.container.querySelectorAll('[data-hero-next]').forEach(function(b) {
+          _this._on(b, 'click', _this.next.bind(_this));
+        });
+        this.container.querySelectorAll('[data-hero-prev]').forEach(function(b) {
+          _this._on(b, 'click', _this.prev.bind(_this));
+        });
+
+        this.dots.forEach(function(d) {
+          _this._on(d, 'click', function() {
+            _this.goSlide(parseInt(d.dataset.heroDot, 10));
+          });
+          _this._on(d, 'keydown', function(e) {
+            var key = e.key;
+            if (key === 'ArrowRight' || key === 'ArrowDown') { e.preventDefault(); _this.goSlide(_this.cur + 1, true); }
+            else if (key === 'ArrowLeft' || key === 'ArrowUp') { e.preventDefault(); _this.goSlide(_this.cur - 1, true); }
+            else if (key === 'Home') { e.preventDefault(); _this.goSlide(0, true); }
+            else if (key === 'End') { e.preventDefault(); _this.goSlide(_this.total - 1, true); }
+          });
+        });
+
+        var sx = 0;
+        this._on(this.container, 'touchstart', function(e) {
+          sx = e.changedTouches[0].screenX;
+        }, { passive: true });
+        this._on(this.container, 'touchend', function(e) {
+          var dx = e.changedTouches[0].screenX - sx;
+          if (Math.abs(dx) > 40) { dx < 0 ? _this.next() : _this.prev(); }
+        });
+
+        // Pause autoplay on hover & keyboard focus (usability + a11y) so the
+        // slide can't advance while a user is reading or operating a control.
+        this._on(this.container, 'mouseenter', function() { _this.pause(); });
+        this._on(this.container, 'mouseleave', function() { if (!_this.userPaused) { _this.resetTimer(); } });
+        this._on(this.container, 'focusin', function() { _this.pause(); });
+        this._on(this.container, 'focusout', function(e) {
+          if (!_this.userPaused && !_this.container.contains(e.relatedTarget)) { _this.resetTimer(); }
+        });
+
+        this.resetTimer();
+      },
+
+      _on: function(target, event, handler, options) {
+        target.addEventListener(event, handler, options);
+        this.listeners.push({ t: target, e: event, h: handler, o: options });
+      },
+
+      goSlide: function(n, focusDot) {
+        var prev = this.slides[this.cur];
+        if (prev) {
+          prev.classList.remove('active');
+          prev.setAttribute('aria-hidden', 'true');
+          prev.setAttribute('inert', '');
+        }
+        if (this.dots[this.cur]) {
+          this.dots[this.cur].classList.remove('active');
+          this.dots[this.cur].removeAttribute('aria-current');
+          this.dots[this.cur].setAttribute('tabindex', '-1');
+        }
+        this.cur = ((n % this.total) + this.total) % this.total;
+        var curSlide = this.slides[this.cur];
+        if (curSlide) {
+          curSlide.classList.add('active');
+          curSlide.removeAttribute('aria-hidden');
+          curSlide.removeAttribute('inert');
+        }
+        if (this.dots[this.cur]) {
+          this.dots[this.cur].classList.add('active');
+          this.dots[this.cur].setAttribute('aria-current', 'true');
+          this.dots[this.cur].setAttribute('tabindex', '0');
+          if (focusDot) { this.dots[this.cur].focus(); }
+        }
+        this.resetTimer();
+      },
+
+      next: function() { this.goSlide(this.cur + 1); },
+      prev: function() { this.goSlide(this.cur - 1); },
+
+      resetTimer: function() {
+        if (this.timer) { clearInterval(this.timer); this.timer = null; }
+        if (this.autoplay && this.total > 1 && !this.reduceMotion && !this.userPaused) {
+          this.timer = setInterval(this.next.bind(this), this.speed);
+        }
+      },
+
+      pause: function() {
+        if (this.timer) { clearInterval(this.timer); this.timer = null; }
+      },
+
+      onUnload: function() {
+        this.pause();
+        this.listeners.forEach(function(l) {
+          l.t.removeEventListener(l.e, l.h, l.o);
+        });
+        this.listeners.length = 0;
+        this._booted = false;
+      },
+
+      onDeselect: function() {
+        this.resetTimer();
+      },
+
+      onBlockSelect: function(evt) {
+        var slide = this.container.querySelector('.slide[data-block-id="' + evt.detail.blockId + '"]');
+        if (slide) {
+          this.pause();
+          this.goSlide(parseInt(slide.dataset.slide, 10));
+        }
+      },
+
+      onBlockDeselect: function() {
+        this.resetTimer();
+      }
+    });
+
+    return HeroSlider;
+  })();
+
+  /* KANSAWALA generic fade-up reveal (9.1.0 migration · Phase 4).
+     Self-booting; ports 9.0.0 theme.custom.js initFadeUp. Section root:
+     <section data-kw-fade-up [data-kw-fade-up-selector=".fu"] [data-kw-fade-up-threshold="0.1"]>.
+     Adds js-kw-fadeup to <html> so the reveal CSS only activates with JS alive,
+     then IntersectionObserver adds .in to .fu elements (one-shot). Reduced motion
+     is handled by the kw-tokens global floor (collapses the reveal transition). */
+  (function () {
+    'use strict';
+    var BOOTED = false;
+    function ensureHtmlFlag() {
+      if (BOOTED) return;
+      BOOTED = true;
+      document.documentElement.classList.add('js-kw-fadeup');
+    }
+    function initFadeUp(root) {
+      if (root.dataset.kwFadeInit === '1') return;
+      root.dataset.kwFadeInit = '1';
+      ensureHtmlFlag();
+      var selector = root.dataset.kwFadeUpSelector || '.fu';
+      var threshold = parseFloat(root.dataset.kwFadeUpThreshold || '0.1');
+      var els = root.querySelectorAll(selector);
+      if (!els.length) return;
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        });
+      }, { threshold: threshold });
+      els.forEach(function (el) { obs.observe(el); });
+    }
+    function bootFadeUp() {
+      document.querySelectorAll('[data-kw-fade-up]').forEach(initFadeUp);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootFadeUp);
+    } else {
+      bootFadeUp();
+    }
+    document.addEventListener('shopify:section:load', function (e) {
+      if (!e.target || !e.target.querySelectorAll) return;
+      e.target.querySelectorAll('[data-kw-fade-up]').forEach(initFadeUp);
+      if (e.target.matches && e.target.matches('[data-kw-fade-up]')) {
+        initFadeUp(e.target);
+      }
+    });
+  })();
+
+  /* KANSAWALA trust-numbers count-up + fade-up reveal (9.1.0 migration · Phase 5).
+     Self-booting; ports 9.0.0 theme.custom.js initTrustNumbers. Section root
+     <... data-kw-trust-numbers>: counts .trust-num[data-target] up on scroll
+     (IO threshold 0.5), reveals .fu items (threshold 0.1), honors reduced-motion,
+     and falls back to final values when IntersectionObserver is unavailable. */
+  (function () {
+    'use strict';
+    function initTrustNumbers(root) {
+      if (root.dataset.kwTrustInit === '1') return;
+      root.dataset.kwTrustInit = '1';
+      // Flag the document so the section's .fu hide rules only apply with JS alive
+      // (no-JS / failed-JS keeps the band visible — no hidden-content trap).
+      document.documentElement.classList.add('js-kw-fadeup');
+      var reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function fmt(n) { return n.toLocaleString('en-US'); }
+      function animCount(el, target, suffix) {
+        if (reduceMotion) { el.textContent = fmt(target) + suffix; return; }
+        var c = 0, step = target / 55;
+        var t = setInterval(function () {
+          c += step;
+          if (c >= target) { el.textContent = fmt(target) + suffix; clearInterval(t); }
+          else el.textContent = fmt(Math.floor(c)) + suffix;
+        }, 16);
+      }
+      if (!('IntersectionObserver' in window)) {
+        root.querySelectorAll('[data-target]').forEach(function (el) {
+          var n = parseInt(el.dataset.target, 10);
+          el.textContent = (isNaN(n) ? (el.dataset.target || '') : fmt(n)) + (el.dataset.suffix || '');
+        });
+        root.querySelectorAll('.fu').forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var fuObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); fuObs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      root.querySelectorAll('.fu').forEach(function (el) { fuObs.observe(el); });
+      var cObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.querySelectorAll('[data-target]').forEach(function (el) {
+              var raw = el.dataset.target || '';
+              var suffix = el.dataset.suffix || '';
+              var target = parseInt(raw, 10);
+              if (isNaN(target)) { el.textContent = raw + suffix; return; }
+              animCount(el, target, suffix);
+            });
+            cObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      cObs.observe(root);
+    }
+    function bootTrustNumbers() {
+      document.querySelectorAll('[data-kw-trust-numbers]').forEach(initTrustNumbers);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootTrustNumbers);
+    } else {
+      bootTrustNumbers();
+    }
+    document.addEventListener('shopify:section:load', function (e) {
+      if (!e.target || !e.target.querySelectorAll) return;
+      e.target.querySelectorAll('[data-kw-trust-numbers]').forEach(initTrustNumbers);
+      if (e.target.matches && e.target.matches('[data-kw-trust-numbers]')) {
+        initTrustNumbers(e.target);
+      }
+    });
+  })();
+
   theme.StoreAvailability = (function() {
     var selectors = {
       drawerOpenBtn: '.js-drawer-open-availability',
@@ -8490,6 +8773,7 @@ theme.recentlyViewed = {
     theme.sections = new theme.Sections();
 
     theme.sections.register('slideshow-section', theme.SlideshowSection);
+    theme.sections.register('hero-slider', theme.HeroSlider);
     theme.sections.register('header', theme.HeaderSection);
     theme.sections.register('product', theme.Product);
     theme.sections.register('blog', theme.Blog);
