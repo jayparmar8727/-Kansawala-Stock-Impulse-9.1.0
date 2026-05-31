@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "footer",
   "name": "t:sections.footer-group.name",
@@ -39,8 +48,11 @@
           }
         }
       },
-      "block_order": ["promotion-1", "promotion-2", "promotion-3"],
-      "disabled": true,
+      "block_order": [
+        "promotion-1",
+        "promotion-2",
+        "promotion-3"
+      ],
       "settings": {
         "hide_homepage": false
       }
@@ -52,7 +64,7 @@
           "type": "menu",
           "settings": {
             "show_footer_title": true,
-            "menu": "new-footer-shop",
+            "menu": "",
             "container_width": 20
           }
         },
@@ -60,7 +72,7 @@
           "type": "menu",
           "settings": {
             "show_footer_title": true,
-            "menu": "new-footer-the-company",
+            "menu": "",
             "container_width": 20
           }
         },
@@ -68,7 +80,7 @@
           "type": "menu",
           "settings": {
             "show_footer_title": true,
-            "menu": "new-footer-get-help",
+            "menu": "",
             "container_width": 20
           }
         },
@@ -82,7 +94,12 @@
           }
         }
       },
-      "block_order": ["menu-1", "menu-2", "menu-3", "newsletter"],
+      "block_order": [
+        "menu-1",
+        "menu-2",
+        "menu-3",
+        "newsletter"
+      ],
       "settings": {
         "show_currency_selector": false,
         "show_currency_flags": false,
@@ -93,5 +110,8 @@
       }
     }
   },
-  "order": ["footer-promotions", "footer"]
+  "order": [
+    "footer-promotions",
+    "footer"
+  ]
 }
