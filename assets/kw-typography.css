@@ -379,5 +379,9 @@
      italic accent (.t-display em) intentionally kept;
    • body line-height 1.4 (was --lh-base 1.7) to match the stock rhythm.
    Later in the file than the base rules → same specificity, this wins. */
-.t-display, .t-display-lg, .t-display-sm { font-weight: 400; }
+.t-display, .t-display-lg, .t-display-sm,
+.t-heading, .t-heading-sm, .t-card-title { font-weight: 400; }
 .t-body, .t-body-lg, .t-body-sm { line-height: 1.4; }
+/* Cormorant serif accents (.t-display em, .t-card-title em, .t-card-title-serif*,
+   .t-body-serif, .t-quote, .t-stat-serif-upright) intentionally stay light/300 —
+   that's the brand layer; stock has no Cormorant. */
