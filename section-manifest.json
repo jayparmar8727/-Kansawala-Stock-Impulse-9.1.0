@@ -6,25 +6,24 @@
     "collections-grid": { "owner": "custom", "status": "ready", "placed_in": [] },
     "global-presence": { "owner": "custom", "status": "ready", "placed_in": [] },
     "trust-numbers": { "owner": "custom", "status": "ready", "placed_in": [] },
-    "heritage-timeline": { "owner": "custom", "status": "ready", "placed_in": [] }
+    "heritage-timeline": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "bestsellers": { "owner": "custom", "status": "ready", "placed_in": [], "js": true },
+    "brand-story": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "three-sacred-metals": { "owner": "custom", "status": "ready", "placed_in": [], "js": true },
+    "ayurveda": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "b2b-trust": { "owner": "custom", "status": "ready", "placed_in": [], "js": true },
+    "meaning-legacy": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "customer-reviews": { "owner": "custom", "status": "ready", "placed_in": [], "app_block": "judge-me" },
+    "craft-process": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "buy-back-promise": { "owner": "custom", "status": "ready", "placed_in": [] },
+    "kw-newsletter": { "owner": "custom", "status": "ready", "placed_in": [] }
   },
-  "pending": [
-    "bestsellers",
-    "brand-story",
-    "b2b-trust",
-    "three-sacred-metals",
-    "customer-reviews",
-    "ayurveda",
-    "meaning-legacy",
-    "buy-back-promise",
-    "craft-process",
-    "kw-newsletter"
-  ],
+  "pending": [],
   "foundation": {
     "assets/kw-tokens.css": "design tokens (:root) + reduced-motion floor",
-    "assets/kw-typography.css": ".t-* typography utilities (grows per section)",
+    "assets/kw-typography.css": ".t-* typography utilities (no new utilities needed for sections 7-16)",
     "snippets/kw-fonts.liquid": "Jost + Cormorant Garamond (Google Fonts)",
-    "assets/theme.js": "theme.HeroSlider class + registration; fade-up reveal IIFE ([data-kw-fade-up]); trust-numbers count-up IIFE ([data-kw-trust-numbers])",
+    "assets/theme.js": "theme.HeroSlider class + registration; fade-up reveal IIFE ([data-kw-fade-up]); trust-numbers count-up IIFE ([data-kw-trust-numbers]); three-sacred-metals slider IIFE; bestsellers tabs IIFE; b2b-trust testimonial slider IIFE (all self-booting via data-section-type)",
     "layout/theme.liquid": "head wiring: kw-tokens, kw-typography, kw-fonts"
   }
 }

@@ -6146,6 +6146,406 @@ theme.recentlyViewed = {
     });
   })();
 
+  /* KANSAWALA three-sacred-metals — mobile scroll-snap slider + dots + autoplay
+     (9.1.0 migration · Phase 8). Self-booting; ports 9.0.0 initSacredMetals.
+     Desktop stays a static 3-col grid; slider runs only <=749px. Honors
+     prefers-reduced-motion, re-inits on shopify:section:load, cleans up on
+     unload, jumps to the selected card on shopify:block:select. */
+  (function () {
+    'use strict';
+
+    var registry = []; // { root, teardown } — for unload cleanup
+
+    function initSacredMetals(root) {
+      if (root.dataset.tsmBooted === '1') return;
+      root.dataset.tsmBooted = '1';
+
+      var grid = root.querySelector('.tsm-grid');
+      if (!grid) return;
+      var slides = grid.querySelectorAll('.tsm-card');
+      if (!slides.length) return;
+      var dots = root.querySelectorAll('.tsm-dot');
+
+      var reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var mqMobile = window.matchMedia ? window.matchMedia('(max-width:749px)') : null;
+
+      var listeners = [];
+      function on(target, evt, handler, opts) {
+        target.addEventListener(evt, handler, opts);
+        listeners.push({ t: target, e: evt, h: handler, o: opts });
+      }
+
+      function activeIndex() {
+        var center = grid.scrollLeft + grid.clientWidth / 2;
+        var best = 0, bestDist = Infinity;
+        for (var i = 0; i < slides.length; i++) {
+          var sc = slides[i].offsetLeft + slides[i].offsetWidth / 2;
+          var d = Math.abs(sc - center);
+          if (d < bestDist) { bestDist = d; best = i; }
+        }
+        return best;
+      }
+      function setActive(i) {
+        for (var k = 0; k < dots.length; k++) {
+          dots[k].classList.toggle('is-active', k === i);
+        }
+      }
+      function scrollToIndex(idx) {
+        var s = slides[idx];
+        if (!s) return;
+        grid.scrollTo({ left: s.offsetLeft - (grid.clientWidth - s.offsetWidth) / 2, behavior: 'smooth' });
+      }
+
+      var raf = null;
+      on(grid, 'scroll', function () {
+        if (raf) return;
+        raf = requestAnimationFrame(function () { raf = null; setActive(activeIndex()); });
+      }, { passive: true });
+
+      for (var i = 0; i < dots.length; i++) {
+        (function (idx) {
+          on(dots[idx], 'click', function () { scrollToIndex(idx); pauseTemp(); });
+        })(i);
+      }
+
+      on(grid, 'touchstart', function () { pauseTemp(); }, { passive: true });
+      on(grid, 'pointerdown', function () { pauseTemp(); }, { passive: true });
+      on(grid, 'wheel', function () { pauseTemp(); }, { passive: true });
+
+      var autoplay = root.dataset.autoplay === 'true';
+      var intervalMs = Math.max(1, parseFloat(root.dataset.interval || '5')) * 1000;
+      var sliderMode = (root.dataset.mobileLayout || 'slider') === 'slider';
+      var timer = null, paused = false, visible = true, pauseT = null;
+
+      function canRun() {
+        return autoplay && sliderMode && slides.length > 1 && !reduceMotion &&
+               visible && !paused && (!mqMobile || mqMobile.matches);
+      }
+      function tick() {
+        scrollToIndex((activeIndex() + 1) % slides.length);
+      }
+      function start() {
+        if (timer || !canRun()) return;
+        timer = setInterval(tick, intervalMs);
+      }
+      function stop() { if (timer) { clearInterval(timer); timer = null; } }
+      function pauseTemp(ms) {
+        paused = true; stop();
+        clearTimeout(pauseT);
+        pauseT = setTimeout(function () { paused = false; start(); }, ms || 6000);
+      }
+
+      var io = null;
+      if ('IntersectionObserver' in window) {
+        io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            visible = e.isIntersecting;
+            if (visible) start(); else stop();
+          });
+        }, { threshold: 0.25 });
+        io.observe(root);
+      }
+      on(document, 'visibilitychange', function () {
+        if (document.hidden) stop(); else start();
+      });
+      if (mqMobile) {
+        var onMq = function () { if (mqMobile.matches) start(); else stop(); };
+        if (mqMobile.addEventListener) mqMobile.addEventListener('change', onMq);
+        else if (mqMobile.addListener) mqMobile.addListener(onMq);
+        listeners.push({ mq: mqMobile, h: onMq });
+      }
+
+      start();
+
+      function teardown() {
+        stop();
+        clearTimeout(pauseT);
+        if (io) { io.disconnect(); io = null; }
+        listeners.forEach(function (l) {
+          if (l.mq) {
+            if (l.mq.removeEventListener) l.mq.removeEventListener('change', l.h);
+            else if (l.mq.removeListener) l.mq.removeListener(l.h);
+          } else {
+            l.t.removeEventListener(l.e, l.h, l.o);
+          }
+        });
+        listeners.length = 0;
+        root.dataset.tsmBooted = '';
+      }
+      registry.push({ root: root, teardown: teardown, scrollToIndex: scrollToIndex });
+    }
+
+    function entryFor(el) {
+      for (var i = 0; i < registry.length; i++) { if (registry[i].root === el) return registry[i]; }
+      return null;
+    }
+    function removeEntry(el) {
+      for (var i = registry.length - 1; i >= 0; i--) {
+        if (registry[i].root === el) { registry[i].teardown(); registry.splice(i, 1); }
+      }
+    }
+
+    function boot() {
+      document.querySelectorAll('[data-section-type="three-sacred-metals"]').forEach(initSacredMetals);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+
+    document.addEventListener('shopify:section:load', function (e) {
+      if (!e.target || !e.target.querySelectorAll) return;
+      e.target.querySelectorAll('[data-section-type="three-sacred-metals"]').forEach(initSacredMetals);
+      if (e.target.matches && e.target.matches('[data-section-type="three-sacred-metals"]')) {
+        initSacredMetals(e.target);
+      }
+    });
+
+    document.addEventListener('shopify:section:unload', function (e) {
+      if (!e.target) return;
+      var roots = e.target.querySelectorAll ? e.target.querySelectorAll('[data-section-type="three-sacred-metals"]') : [];
+      roots.forEach(removeEntry);
+      if (e.target.matches && e.target.matches('[data-section-type="three-sacred-metals"]')) {
+        removeEntry(e.target);
+      }
+    });
+
+    document.addEventListener('shopify:block:select', function (e) {
+      if (!e.target || !e.detail) return;
+      var root = e.target.closest ? e.target.closest('[data-section-type="three-sacred-metals"]') : null;
+      if (!root) return;
+      var entry = entryFor(root);
+      var card = root.querySelector('.tsm-card[data-block-id="' + e.detail.blockId + '"]');
+      if (entry && card) { entry.scrollToIndex(parseInt(card.dataset.tsmSlide, 10) || 0); }
+    });
+  })();
+
+  /* KANSAWALA bestsellers — tabbed featured-products grid (9.1.0 migration ·
+     Phase 5). Self-booting; wires the ARIA tablist (roving tabindex + arrows),
+     re-inits on shopify:section:load, activates the editor-selected tab on
+     shopify:block:select. Init-once via data-bsl-booted. */
+  (function () {
+    function activate(section, idx, focusTab) {
+      var tabs   = section.querySelectorAll('[data-bsl-tab]');
+      var panels = section.querySelectorAll('[data-bsl-panel]');
+      if (!tabs.length) return;
+      if (idx < 0) idx = 0;
+      if (idx > tabs.length - 1) idx = tabs.length - 1;
+
+      for (var i = 0; i < tabs.length; i++) {
+        var on = i === idx;
+        tabs[i].classList.toggle('is-active', on);
+        tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+        tabs[i].setAttribute('tabindex', on ? '0' : '-1');
+      }
+      for (var p = 0; p < panels.length; p++) {
+        var pon = p === idx;
+        panels[p].classList.toggle('is-active', pon);
+        if (pon) { panels[p].removeAttribute('hidden'); }
+        else     { panels[p].setAttribute('hidden', ''); }
+      }
+      if (focusTab && tabs[idx]) tabs[idx].focus();
+    }
+
+    function indexOfTab(section, tab) {
+      var tabs = section.querySelectorAll('[data-bsl-tab]');
+      for (var i = 0; i < tabs.length; i++) { if (tabs[i] === tab) return i; }
+      return 0;
+    }
+
+    function bind(section) {
+      if (!section || section.dataset.bslBooted === 'true') return;
+      section.dataset.bslBooted = 'true';
+
+      var tabs = section.querySelectorAll('[data-bsl-tab]');
+      if (!tabs.length) return;
+
+      Array.prototype.forEach.call(tabs, function (tab) {
+        tab.addEventListener('click', function () {
+          activate(section, indexOfTab(section, tab), false);
+        });
+        tab.addEventListener('keydown', function (e) {
+          var count = tabs.length;
+          var cur = indexOfTab(section, tab);
+          var next = null;
+          switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowDown': next = (cur + 1) % count; break;
+            case 'ArrowLeft':
+            case 'ArrowUp':   next = (cur - 1 + count) % count; break;
+            case 'Home':      next = 0; break;
+            case 'End':       next = count - 1; break;
+            default: return;
+          }
+          e.preventDefault();
+          activate(section, next, true);
+        });
+      });
+    }
+
+    function boot(root) {
+      var scope = root && root.querySelectorAll ? root : document;
+      var sections = scope.querySelectorAll('[data-section-type="bestsellers"]');
+      Array.prototype.forEach.call(sections, bind);
+      if (root && root.getAttribute && root.getAttribute('data-section-type') === 'bestsellers') {
+        bind(root);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { boot(document); });
+    } else {
+      boot(document);
+    }
+
+    document.addEventListener('shopify:section:load', function (e) {
+      boot(e.target);
+    });
+
+    document.addEventListener('shopify:block:select', function (e) {
+      var section = e.target.closest
+        ? e.target.closest('[data-section-type="bestsellers"]')
+        : null;
+      if (!section) return;
+      var blockId = e.target.getAttribute('data-block-id');
+      var tab = section.querySelector('[data-bsl-tab][data-block-id="' + blockId + '"]');
+      if (tab) activate(section, indexOfTab(section, tab), false);
+    });
+  })();
+
+  /* KANSAWALA b2b-trust — testimonial-card mobile carousel + autoplay (9.1.0
+     migration · Phase 10). Self-booting; drives only the testimonial slider
+     (the partner-logo strip is a pure CSS marquee). Autoplay runs only <=749px,
+     paused under reduced-motion / hover / interaction / tab-hidden / offscreen.
+     Re-inits on shopify:section:load, cleans up on unload, jumps to the selected
+     testimonial on shopify:block:select. */
+  (function () {
+    'use strict';
+
+    function initB2bTrust(root) {
+      if (root.dataset.b2bBooted === '1') return;
+      root.dataset.b2bBooted = '1';
+
+      var reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var grid = root.querySelector('.b2b-grid');
+      if (!grid) return;
+      var slides = grid.querySelectorAll('.b2b-card');
+      if (!slides.length) return;
+      var dots = root.querySelectorAll('.b2b-dot');
+      var listeners = [];
+      function on(t, e, h, o) { t.addEventListener(e, h, o); listeners.push({ t: t, e: e, h: h, o: o }); }
+
+      function activeIndex() {
+        var center = grid.scrollLeft + grid.clientWidth / 2;
+        var best = 0, bestDist = Infinity;
+        for (var i = 0; i < slides.length; i++) {
+          var s = slides[i];
+          var sc = s.offsetLeft + s.offsetWidth / 2;
+          var d = Math.abs(sc - center);
+          if (d < bestDist) { bestDist = d; best = i; }
+        }
+        return best;
+      }
+      function setActive(i) {
+        for (var k = 0; k < dots.length; k++) { dots[k].classList.toggle('is-active', k === i); }
+      }
+      function scrollToIndex(idx) {
+        var s = slides[idx];
+        if (!s) return;
+        grid.scrollTo({ left: s.offsetLeft - (grid.clientWidth - s.offsetWidth) / 2, behavior: 'smooth' });
+      }
+
+      if (dots.length) {
+        var raf = null;
+        on(grid, 'scroll', function () {
+          if (raf) return;
+          raf = requestAnimationFrame(function () { raf = null; setActive(activeIndex()); });
+        }, { passive: true });
+        for (var i = 0; i < dots.length; i++) {
+          (function (idx) { on(dots[idx], 'click', function () { scrollToIndex(idx); }); })(i);
+        }
+      }
+
+      function onBlockSelect(e) {
+        var id = e && e.detail && e.detail.blockId;
+        if (!id) return;
+        for (var k = 0; k < slides.length; k++) {
+          if (slides[k].getAttribute('data-block-id') === id) { scrollToIndex(k); break; }
+        }
+      }
+      document.addEventListener('shopify:block:select', onBlockSelect);
+
+      var autoplay = root.dataset.autoplay === 'true';
+      var intervalMs = Math.max(1, parseFloat(root.dataset.interval || '5')) * 1000;
+
+      var timer = null, paused = false, visible = true, mq = null, io = null;
+      function start() {
+        if (timer || paused || !visible || !mq || !mq.matches) return;
+        timer = setInterval(function () { scrollToIndex((activeIndex() + 1) % slides.length); }, intervalMs);
+      }
+      function stop() { if (timer) { clearInterval(timer); timer = null; } }
+      function pauseTemp(ms) {
+        paused = true; stop();
+        clearTimeout(pauseTemp._t);
+        pauseTemp._t = setTimeout(function () { paused = false; start(); }, ms || 6000);
+      }
+      function onVisibility() { if (document.hidden) stop(); else start(); }
+
+      if (autoplay && slides.length > 1 && !reduceMotion &&
+          'matchMedia' in window && 'IntersectionObserver' in window) {
+        mq = window.matchMedia('(max-width: 749px)');
+        io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) { visible = en.isIntersecting; if (visible) start(); else stop(); });
+        }, { threshold: 0.25 });
+        io.observe(root);
+        document.addEventListener('visibilitychange', onVisibility);
+        on(grid, 'touchstart', function () { pauseTemp(); }, { passive: true });
+        on(grid, 'pointerdown', function () { pauseTemp(); }, { passive: true });
+        on(grid, 'wheel', function () { pauseTemp(); }, { passive: true });
+        on(root, 'mouseenter', function () { paused = true; stop(); });
+        on(root, 'mouseleave', function () { paused = false; start(); });
+        for (var d = 0; d < dots.length; d++) { on(dots[d], 'click', function () { pauseTemp(); }); }
+        if (mq.addEventListener) { mq.addEventListener('change', function () { if (mq.matches) start(); else stop(); }); }
+        start();
+      }
+
+      function cleanup() {
+        stop();
+        clearTimeout(pauseTemp._t);
+        if (io) { io.disconnect(); io = null; }
+        document.removeEventListener('visibilitychange', onVisibility);
+        document.removeEventListener('shopify:block:select', onBlockSelect);
+        listeners.forEach(function (l) { l.t.removeEventListener(l.e, l.h, l.o); });
+        listeners.length = 0;
+        document.removeEventListener('shopify:section:unload', onUnload);
+        delete root.dataset.b2bBooted;
+      }
+      function onUnload(e) {
+        if (e && e.target && (e.target === root || e.target.contains(root))) cleanup();
+      }
+      document.addEventListener('shopify:section:unload', onUnload);
+    }
+
+    function boot(scope) {
+      (scope || document).querySelectorAll('[data-section-type="b2b-trust"]').forEach(initB2bTrust);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { boot(); });
+    } else {
+      boot();
+    }
+    document.addEventListener('shopify:section:load', function (e) {
+      if (!e.target || !e.target.querySelectorAll) return;
+      boot(e.target);
+      if (e.target.matches && e.target.matches('[data-section-type="b2b-trust"]')) initB2bTrust(e.target);
+    });
+  })();
+
   theme.StoreAvailability = (function() {
     var selectors = {
       drawerOpenBtn: '.js-drawer-open-availability',

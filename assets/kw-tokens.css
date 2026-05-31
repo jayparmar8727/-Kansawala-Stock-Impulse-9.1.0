@@ -23,7 +23,7 @@
   --off:#FAF5EE;
 
   /* ═══ FONT FAMILIES · rich fallbacks ═══ */
-  --d:'Jost',-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  --d:'Jost', sans-serif;
   --s:'Cormorant Garamond','Times New Roman',Georgia,serif;
 
   /* ═══ FLUID TYPE SCALE · Major Third (1.25×) ═══ */

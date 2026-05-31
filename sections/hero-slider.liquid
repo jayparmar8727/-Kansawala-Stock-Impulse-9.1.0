@@ -162,9 +162,9 @@
     line-height: 1.06;
     margin-bottom: 8px;
     font-size: {{ heading_size_desktop }}px;
-    /* Override global .t-display weight — too thin on photography at small
-       viewports (320–375px). */
-    font-weight: var(--fw-light);
+    /* Stock-match: Jost 400 (was --fw-light 300) for consistency with the
+       stock heading weight; 400 also reads better over photography. */
+    font-weight: 400;
     /* Subtle drop-shadow improves legibility on bright slide imagery. */
     text-shadow: 0 1px 24px rgba(0, 0, 0, 0.2);
   }

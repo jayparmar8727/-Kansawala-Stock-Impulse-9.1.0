@@ -117,11 +117,94 @@ each topped by a dot, revealing on scroll. Static; reuses the shared fade-up. `m
 
 **Class map** — year `ht-era t-stat-serif-upright`; title `ht-title t-label`; description `ht-desc t-body-sm`.
 
----
+### bestsellers — `sections/bestsellers.liquid`
+Tabbed featured-products grid. `tab` blocks (label + `collection` + `product_count`) switch server-rendered product
+panels. Self-booting **tabs IIFE** (`data-section-type="bestsellers"`) drives a real ARIA tablist; first panel is
+`.is-active` so it works with no JS. Stock `product-grid-item` left untouched — the kw product card is reproduced
+inline.
 
-## Pending sections
-See [MIGRATION-LOG.md](MIGRATION-LOG.md) for the full port checklist
-(collections-grid, marquee-strip, trust-numbers, global-presence,
-heritage-timeline, bestsellers, brand-story, b2b-trust, three-sacred-metals,
-customer-reviews, ayurveda, meaning-legacy, buy-back-promise, craft-process,
-kw-newsletter). Each entry will document its class map here as it lands.
+**Wiring** — root `.bsl-{{ section.id }}`; `.bsl-tabs[role=tablist]` > `.bsl-tab[role=tab][data-bsl-tab][data-block-id]`;
+`.bsl-panel[role=tabpanel][data-bsl-panel]` > `.bsl-grid` > `.bsl-card`. First tab's first row eager+`fetchpriority`.
+**Class map** — eyebrow `t-eyebrow t-eyebrow--dash`; heading `t-display`(+`em`); tab `t-label t-label-tab`; product
+name `t-card-name`; ATC `t-card-cta`; empty `t-body`.
+
+### brand-story — `sections/brand-story.liquid`
+Two-column image + story (eyebrow, heading, body, pull-quote, body, pills, CTA) + optional "Est." badge. Static,
+fade-up. Native `image_tag` (picker) / lazy `<img>` (external URL) — 9.0.0's `kw-image` snippet was reimplemented.
+
+**Wiring** — root `.bst-{{ section.id }}` `data-kw-fade-up`; `.story-grid` > `.s-vis.fu` (image + badge) + `.s-text.fu`.
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`(+`em`); body `t-body`; quote `t-body-serif`; pill
+`t-label`; CTA `t-link`; badge year `t-stat-serif-upright` + label `t-label`.
+
+### three-sacred-metals — `sections/three-sacred-metals.liquid`
+3 metal cards (image + label + name + subtitle + description + 3 benefits + CTA). Desktop static 3-col; **mobile
+scroll-snap slider** (dots + autoplay) via the self-booting `tsm` IIFE (mobile-only, reduced-motion-paused). Benefit
+lines baked at `opacity:.75`. `metal_card` blocks.
+
+**Wiring** — root `.tsm-{{ section.id }}` `data-section-type="three-sacred-metals"` `data-autoplay/-interval/-dots`;
+`.tsm-grid` (scroll track) > `.tsm-card[data-tsm-slide][data-block-id]`; `.tsm-dot[data-tsm-dot]`.
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`(+`em`); label `t-label`; name `t-card-title`(+`em`);
+desc `t-body-sm`; benefits `t-label-tight`; CTA `t-link t-link-spacious`.
+
+### ayurveda — `sections/ayurveda.liquid`
+4 `benefit` cards (tag/number + title + description) in a column-divided grid with a top border. Static, fade-up.
+Preserves 9.0.0's 900/749 breakpoints (4→2→1 col).
+
+**Wiring** — root `.ayv-{{ section.id }}` `data-kw-fade-up`; `.ayur-grid` > `.ag.fu`.
+**Class map** — eyebrow `t-eyebrow t-eyebrow--dash`; heading `t-display`(+`em`); tag `t-label`; title `t-label`;
+description `t-body-sm`.
+
+### b2b-trust — `sections/b2b-trust.liquid`
+Three parts: client-logo **CSS marquee** (`client` blocks, sr-only real list, reduced-motion-safe) + **testimonial
+slider** (`testimonial` blocks; self-booting `b2b` IIFE: dots/autoplay/swipe, mobile-only) + a 4-stat brown band.
+
+**Wiring** — root `.b2b-{{ section.id }}` `data-section-type="b2b-trust"` `data-autoplay/-interval/-dots`;
+`.b2b-strip`/`.b2b-strip-track` (CSS marquee, JS never touches); `.b2b-grid` > `.b2b-card[data-b2b-slide][data-block-id]`;
+`.b2b-dot[data-b2b-dot]`; `.b2b-band`.
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`(+`em`); sub `t-body-sm`; client name
+`t-card-title-serif-italic`; card title `t-card-title`; stars `t-stars`; band/stat numerals `t-stat-serif-upright`.
+
+### meaning-legacy — `sections/meaning-legacy.liquid`
+4 `step` gift cards (image + label + title + description + CTA) on a stepper/spine. Static, fade-up. Native
+`image_tag` + focal point (`--focal` → `object-position`).
+
+**Wiring** — root `.mlg-{{ section.id }}` `data-kw-fade-up`; each `.mlg-step.fu` (image, `mlg-num`, label, title,
+desc, link).
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`(+`em`); step number `t-stat-serif-upright`; label
+`t-label`; title `t-heading`; description `t-body-sm`; link `t-link`.
+
+### customer-reviews — `sections/customer-reviews.liquid`
+Wraps the **Judge.me `@app` block** with a rating badge + heading + CTA. Schema `blocks: [{ "type": "@app" }]`;
+markup iterates `section.blocks` and renders `block.type == '@app'` via `{% render block %}`. Empty-state when no app
+block. No custom JS (Judge.me self-renders).
+
+**Wiring** — root `.crv-{{ section.id }}`; `.crv-app` wraps the rendered app block.
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`(+`em`); score `t-stat-serif-upright`; stars `t-stars`;
+count `t-eyebrow`; empty `t-body-serif`; CTA `t-link`.
+
+### craft-process — `sections/craft-process.liquid`
+Full-bleed **brown** band; 4 `step` blocks (big **faded** step number + title + description). Static, fade-up. Step
+number baked at `opacity:.3`. Faithful full-bleed spacing (88 / `padding_x` 0).
+
+**Wiring** — root `.cpr-{{ section.id }}` `data-kw-fade-up`; `.cpr-steps` > `.cpr-step.fu` (`cpr-num`, `cpr-title`,
+`cpr-desc`).
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`(+`em`); subtitle `t-body`; step number
+`t-stat-serif-upright`; title `t-label`; description `t-body-sm`.
+
+### buy-back-promise — `sections/buy-back-promise.liquid`
+Two-column: left cream price-proof frame (eyebrow + heading + sub + 3 proof rows + metal note); right **brown**
+promise (heading + 2 paragraphs + 3 pillars + outline button). **Settings-only** (no blocks). `promise_h` is an
+`inline_richtext` (intentional `<em>`) — left un-escaped with a scoped `em` rule; everything else escaped.
+
+**Wiring** — root `.bbp-{{ section.id }}` `data-kw-fade-up`; `.bbp-l.fu` (proof frame) + `.bbp-r.fu` (promise).
+**Class map** — eyebrow `t-eyebrow--dash`; heading `t-display`; sub `t-body`; proof price `t-stat-serif-upright`;
+detail `t-body-sm`; pillar number `t-stat-serif-upright`; pillar label `t-label`; button `t-link`.
+
+### kw-newsletter — `sections/kw-newsletter.liquid`
+Eyebrow + heading + subtext + a real Shopify email signup. Uses `{% form 'customer' %}` (hidden `contact[tags]` =
+`newsletter`, `posted_successfully?` success via `role="status"`, `default_errors`), optional consent checkbox. No
+custom JS.
+
+**Wiring** — root `.nws-{{ section.id }}`; `.nws-form` wraps the `{% form 'customer' %}` input + button.
+**Class map** — eyebrow `t-eyebrow t-eyebrow--dash`; heading `t-display`(+`em`); subtext `t-body`; input/button styled
+locally (`.nws-*`).

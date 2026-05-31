@@ -13,6 +13,9 @@ RemoteAsset:
     - "snippets/kw-fonts.liquid"
     - "sections/hero-slider.liquid"
     - "sections/collections-grid.liquid"
+    - "sections/brand-story.liquid"
+    - "sections/meaning-legacy.liquid"
+    - "sections/b2b-trust.liquid"
 
 AssetPreload:
   ignore:

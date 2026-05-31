@@ -1,0 +1,19 @@
+# Ignore atomic-write temp files so `shopify theme dev` / `theme push` don't try
+# to sync them. Editors and Claude Code save files by writing
+# "<name>.tmp.<pid>.<hash>" then renaming — the watcher can catch the temp file
+# mid-write and error: '… .tmp.… contains illegal characters'. These never belong
+# in the theme.
+*.tmp.*
+*/*.tmp.*
+sections/*.tmp.*
+snippets/*.tmp.*
+assets/*.tmp.*
+layout/*.tmp.*
+templates/*.tmp.*
+config/*.tmp.*
+locales/*.tmp.*
+
+# Editor swap/backup files
+*~
+*.swp
+*.bak

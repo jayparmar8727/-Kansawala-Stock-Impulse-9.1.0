@@ -128,6 +128,47 @@ baked to stock (padding_x 80→40, mobile 20→17); `max_blocks:6` already in so
 delays for eras 5–6; editor empty-state; era `<div>`→`<p>` (semantics). Contrast is fine (light text on brown —
 title 8.4:1, desc 7.7:1). theme-check: 0 errors. See [DESIGN-AUDIT.md](DESIGN-AUDIT.md).
 
+## Phases 7–16 — remaining homepage sections ✅ (2026-05-30)
+Ported **all 10 remaining 9.0.0-homepage sections** in one batch, each a faithful native 9.1.0 port (inline scoped
+CSS, `.t-*` + tokens, OS-2.0 `tag/class/presets`) with the standard fix-set (escape, no opacity controls,
+no-JS-safe `.fu` gate, `max_blocks`, editor empty-states, focus rings, stock spacing, native `image_tag`). **No new
+`.t-*` utilities were needed** — the foundation already covered every section. `shopify theme check` → **0 offenses**
+across all 10 files + `theme.js`.
+
+- **bestsellers** (`bsl-`, JS) — tabbed featured-products grid; tabs (`tab` blocks: label + collection + count) swap
+  server-rendered product panels (kw product card reproduced inline — stock `product-grid-item` left untouched per
+  golden-rule #1; reuses `t-card-name`/`t-card-cta`). Real ARIA tablist (roving tabindex, arrows) via a self-booting
+  IIFE; first panel `.is-active` → no-JS-safe. Price/sale/sold-out + empty-collection states handled.
+- **brand-story** (`bst-`) — two-col image+story+pills+badge+quote+CTA. 9.0.0's `kw-image` snippet (absent in 9.1.0)
+  reimplemented natively (`image_tag` for picker, plain lazy `<img>` w/ width/height for external URL). Fade-up gated.
+- **three-sacred-metals** (`tsm-`, JS) — 3 metal cards; desktop static 3-col, **mobile scroll-snap slider** (dots +
+  autoplay) via self-booting IIFE (mobile-only, reduced-motion-paused, editor block-select). Baked benefit
+  `opacity:.75` (was a 75% control).
+- **ayurveda** (`ayv-`) — 4 `benefit` cards, column dividers + top border. Preserved 9.0.0's 900/749 breakpoints.
+- **b2b-trust** (`b2b-`, JS) — client-logo **CSS marquee** (sr-only real list, reduced-motion-safe, like
+  marquee-strip) + **testimonial slider** (self-booting IIFE: dots/autoplay/swipe, mobile-only) + 4-stat brown band.
+  Two block types (`client`, `testimonial`).
+- **meaning-legacy** (`mlg-`) — 4 `step` gift cards w/ images + stepper/spine; native `image_tag` + focal point;
+  fade-up gated.
+- **customer-reviews** (`crv-`) — wraps the **Judge.me `@app` block** (`{"type":"@app"}` + `{% render block %}` loop)
+  with a rating badge + heading + CTA; empty-state when no app block. Dropped 9.0.0's MutationObserver purge (Judge.me
+  self-renders). No custom JS.
+- **craft-process** (`cpr-`) — full-bleed brown band, 4 `step` blocks with **faded step numbers** (baked
+  `opacity:.3`, was a 30% control). Kept faithful full-bleed spacing (88 / padding_x 0).
+- **buy-back-promise** (`bbp-`) — two-column price-proof (left, cream) + promise (right, brown), settings-only (no
+  blocks). `promise_h` intentionally holds `<em>` → an `inline_richtext`, left **un-escaped** (+ scoped `em` style);
+  everything else escaped.
+- **kw-newsletter** (`nws-`) — real `{% form 'customer' %}` signup (tag `newsletter`, `posted_successfully?` +
+  `default_errors`), optional consent checkbox. No custom JS.
+
+**JS** added to `assets/theme.js` (additive, after the count-up IIFE): three self-booting IIFEs (three-sacred-metals
+slider, bestsellers tabs, b2b-trust testimonial slider) — all `data-section-type`-scoped, reduced-motion-aware, with
+`shopify:section:load`/`unload` + `shopify:block:select` editor support. `node --check` passes. `.theme-check.yml`
+extended to silence the expected `RemoteAsset` (external image-URL) warnings on brand-story/meaning-legacy/b2b-trust.
+
+**Status:** all built + lint-clean + pushed-ready. **Not yet placed** on the homepage (merchant adds each via the
+editor in the live order, assigns product/collection pickers + images, then browser-verify for pixel-fidelity).
+
 ## Convention — no opacity (%) controls (2026-05-30)
 Merchant-facing `*_opacity` range sliders are **not used** — they sat at 100% and just cluttered the customizer.
 Removed from all built sections (hero, marquee, global-presence, trust-numbers, heritage-timeline; collections-grid
@@ -159,13 +200,15 @@ JS class in `theme.js` only if it has behaviour.
 - [x] trust-numbers — ported + audited + fixed (Phase 5; added count-up JS)
 - [x] heritage-timeline — ported + audited + fixed (Phase 6; reuses shared fade-up JS)
 - [x] marquee-strip — ported + audited + fixed (Phase 2)
-- [ ] bestsellers
-- [ ] brand-story
-- [ ] b2b-trust
-- [ ] three-sacred-metals
-- [ ] customer-reviews
-- [ ] ayurveda
-- [ ] meaning-legacy
-- [ ] buy-back-promise
-- [ ] craft-process
-- [ ] kw-newsletter
+- [x] bestsellers — ported (Phase 7; tabs IIFE)
+- [x] brand-story — ported (Phase 8)
+- [x] b2b-trust — ported (Phase 9; marquee + testimonial-slider IIFE)
+- [x] three-sacred-metals — ported (Phase 10; mobile-slider IIFE)
+- [x] customer-reviews — ported (Phase 11; Judge.me @app block)
+- [x] ayurveda — ported (Phase 12)
+- [x] meaning-legacy — ported (Phase 13)
+- [x] buy-back-promise — ported (Phase 14; settings-only, inline_richtext promise)
+- [x] craft-process — ported (Phase 15; faded numbers)
+- [x] kw-newsletter — ported (Phase 16; {% form 'customer' %})
+
+**All 15 homepage sections now ported.** (trust-numbers is also built but is not on the 9.0.0 homepage.)

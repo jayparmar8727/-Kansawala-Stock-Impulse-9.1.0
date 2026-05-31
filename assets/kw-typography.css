@@ -371,3 +371,13 @@
 @media only screen and (min-width: 769px) {
   .rte h4 { font-size: var(--typeH3Size); }
 }
+
+/* ─── STOCK-MATCH (2026-05-31) ─────────────────────────────────────────
+   Align KW headings + body to the stock Jost scale for cross-page
+   consistency (stock H1/H2 = Jost 400; body 16/22 ≈ lh 1.375):
+   • headings Jost 400 (was --fw-light 300) — uppercase + Cormorant
+     italic accent (.t-display em) intentionally kept;
+   • body line-height 1.4 (was --lh-base 1.7) to match the stock rhythm.
+   Later in the file than the base rules → same specificity, this wins. */
+.t-display, .t-display-lg, .t-display-sm { font-weight: 400; }
+.t-body, .t-body-lg, .t-body-sm { line-height: 1.4; }
