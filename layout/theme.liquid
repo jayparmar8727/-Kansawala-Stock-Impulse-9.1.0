@@ -36,6 +36,9 @@
   {{ 'kw-typography.css' | asset_url | stylesheet_tag }}
   {%- render 'kw-fonts' -%}
 
+  {%- comment -%} KANSAWALA global Organization structured data (homepage only) — see SEO.md {%- endcomment -%}
+  {%- if request.page_type == 'index' -%}{%- render 'kw-schema-organization' -%}{%- endif -%}
+
   <script>
     document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
 

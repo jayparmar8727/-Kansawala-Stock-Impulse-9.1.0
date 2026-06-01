@@ -15,7 +15,7 @@
 | Criterion | Status | Where / note |
 |---|---|---|
 | 1.1.1 Non-text content (alt) | ✅ | Product/collection alt from metadata; hero bg `alt=""`; see [SEO.md](SEO.md) §6 |
-| 1.3.1 Info & relationships | ✅ | One `<h1>` (hero slide 1), section `<h2>`/`<h3>`; ⚠️ trust-numbers needs an `<h2>` |
+| 1.3.1 Info & relationships | ✅ | One `<h1>` (hero), section `<h2>`, content items `<h3>`; product/collection tiles + labels non-heading (stock-aligned); trust-numbers has a visually-hidden `<h2>` |
 | 1.4.3 Contrast (text) | ⚠️ mostly | Core text passes AA; **brand buff/brass accents intentionally below AA** — see Policy |
 | 1.4.11 Non-text contrast | ✅ | Focus rings, control borders meet 3:1 |
 | 2.1.1 Keyboard | ✅ | Dots/arrows/links keyboard-operable; roving tabindex on hero dots |

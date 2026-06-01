@@ -183,7 +183,7 @@
         </div>
         <div class="cc-card">
           {%- if block.settings.metal != blank -%}<p class="cc-card-eye t-eyebrow t-eyebrow--dash t-cc-card-eye">{{ block.settings.metal | escape }}</p>{%- endif -%}
-          {%- if block.settings.name != blank -%}<h3 class="cc-card-name t-cc-card-name">{{ block.settings.name | escape }}</h3>{%- endif -%}
+          {%- if block.settings.name != blank -%}<div class="cc-card-name t-cc-card-name">{{ block.settings.name | escape }}</div>{%- endif -%}
         </div>
       </a>
     {%- endfor -%}

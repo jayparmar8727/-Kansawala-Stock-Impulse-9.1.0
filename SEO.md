@@ -51,7 +51,7 @@ Stock Impulse **already ships solid JSON-LD** — this is **not** a from-scratch
 |---|---|---|
 | **BreadcrumbList** | alongside `snippets/breadcrumbs.liquid` (HTML-only today) | Breadcrumb trail in SERP |
 | **WebSite** (+ `SearchAction`) | `theme.liquid` head | Sitelinks search box |
-| **Global Organization** | homepage / global (logo, name, `sameAs` socials) | Brand entity / knowledge panel — today's `Organization` is **scoped to blog articles only**, not site-wide |
+| **Global Organization** ✅ **added** | `snippets/kw-schema-organization.liquid` (rendered in `theme.liquid` head, homepage) | Brand entity / knowledge panel — now emitted site-wide on the homepage (complements stock's article-scoped `Organization`) |
 
 `AggregateRating` on Product is also absent — only worth adding if a reviews app exposes ratings.
 
@@ -59,8 +59,8 @@ Stock Impulse **already ships solid JSON-LD** — this is **not** a from-scratch
 
 - **One `<h1>` per page** — the hero's **first slide** is `<h1>`, later slides `<h2>` (`hero-slider.liquid`). ✅
 - Section headings: collections-grid `<h2>` ✅, global-presence `<h2>` ✅, heritage-timeline item `<h3>` ✅.
-- ⚠️ **trust-numbers has no section heading** — the band is stats only (`role="region"` + `aria-label`, but no
-  visible/semantic `<h2>`). Add an optional, visually-hidden-or-visible `<h2>` for structure (Recommended #4).
+- ✅ **trust-numbers now has a section heading** — a visually-hidden `<h2>` (via `aria-labelledby`) puts the
+  stats band in the heading outline while keeping the design title-free.
 
 ## 6. Image alt text
 
@@ -77,9 +77,9 @@ non-indexable by Shopify default. Leave as-is.
 ---
 
 ## Recommended code changes (proposed — NOT applied; approve individually)
-1. **Add a global Organization JSON-LD** (new `snippets/kw-schema-organization.liquid`, rendered once in
-   `theme.liquid` head or on `index`): name, url, `logo` (settings.logo), `sameAs` social links. *(Additive snippet
-   — complements, doesn't replace, the article-scoped `Organization` that stock already emits.)*
+1. ✅ **DONE — global Organization JSON-LD** (`snippets/kw-schema-organization.liquid`, rendered in `theme.liquid`
+   head on `index`): name, url, `logo` (settings.logo), `sameAs` social links. *(Additive — complements the
+   article-scoped `Organization` stock already emits.)*
 2. **Meta-description fallback** in `theme.liquid`: `page_description | default: collection.description | default:
    product.description | strip_html | truncatewords: 30 | default: shop.description`. *(1-line edit — stock file,
    minimal & reversible.)*
