@@ -88,7 +88,10 @@
     .ayv-{{ section.id }} .ayur-grid { grid-template-columns: repeat(2, 1fr); }
     .ayv-{{ section.id }} .ag { border-right: none; border-bottom: 1px solid {{ divider_color }}; padding: 32px 0; }
     .ayv-{{ section.id }} .ag:not(:first-child) { padding-left: 0; }
-    .ayv-{{ section.id }} .ag:last-child { border-bottom: none; }
+    /* 2-col tablet: drop the bottom divider from the whole LAST ROW (last two
+       cards), not just the last cell — otherwise the bottom-left card keeps a
+       trailing half-line while the bottom-right one doesn't. */
+    .ayv-{{ section.id }} .ag:nth-last-child(-n+2) { border-bottom: none; }
   }
   @media (max-width: 749px) {
     .ayv-{{ section.id }} .ayv-inner { padding: {{ section.settings.padding_top_mobile }}px {{ section.settings.padding_x_mobile }}px {{ section.settings.padding_bottom_mobile }}px; }

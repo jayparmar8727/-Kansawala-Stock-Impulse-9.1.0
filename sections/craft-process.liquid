@@ -103,7 +103,10 @@
     .cpr-{{ section.id }} .cpr-steps { grid-template-columns: repeat(2, 1fr); }
     .cpr-{{ section.id }} .cpr-step { border-right: none; border-bottom: 1px solid {{ divider_color }}; padding: 32px 0; }
     .cpr-{{ section.id }} .cpr-step:not(:first-child) { padding-left: 0; }
-    .cpr-{{ section.id }} .cpr-step:last-child { border-bottom: none; }
+    /* 2-col tablet: drop the bottom divider from the whole LAST ROW (last two
+       steps), not just the last cell — else the bottom-left step keeps a
+       trailing half-line while the bottom-right one doesn't. */
+    .cpr-{{ section.id }} .cpr-step:nth-last-child(-n+2) { border-bottom: none; }
   }
   @media (max-width: 749px) {
     .cpr-{{ section.id }} .cpr-inner { padding: {{ section.settings.padding_top_mobile }}px {{ section.settings.padding_x_mobile }}px {{ section.settings.padding_bottom_mobile }}px; }
