@@ -88,7 +88,11 @@
   .bsl-{{ section.id }} .bsl-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: {{ gap }}px;
+    /* `gap` (merchant setting, default 2px) controls the COLUMN gap only — kept tight on purpose.
+       Row gap is a fixed, generous value so a small `gap` can't collapse the vertical spacing
+       between wrapped rows (otherwise the next row's image touches the ATC button above it). */
+    column-gap: {{ gap }}px;
+    row-gap: 40px;
   }
   .bsl-{{ section.id }} .bsl-grid .bsl-cell { min-width: 0; }
 
