@@ -1123,7 +1123,7 @@
         "rating_border": "#6b3c231f",
         "rating_star_color": "#bc843f",
         "rating_score_color": "#6b3c23",
-        "rating_count_color": "#6b3c2399",
+        "rating_count_color": "#6b3c23",
         "widget_color": "#6b3c23",
         "widget_link_color": "#bc843f"
       }

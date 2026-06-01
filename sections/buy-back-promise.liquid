@@ -121,6 +121,9 @@
     text-align: center;
     padding: 20px 16px 16px;
     color: {{ left_eye_color }};
+    /* eyebrow line-height is 1 — bump it so the label reads cleanly when it
+       wraps to 2 lines on tablet/mobile (e.g. "Copper Price · Source: MCX India"). */
+    line-height: 1.6;
   }
   .bbp-{{ section.id }} .bbp-step + .bbp-step { border-left: 1px solid {{ left_frame_border }}; }
   .bbp-{{ section.id }} .bbp-step { text-align: center; }
