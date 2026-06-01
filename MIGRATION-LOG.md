@@ -212,3 +212,31 @@ JS class in `theme.js` only if it has behaviour.
 - [x] kw-newsletter — ported (Phase 16; {% form 'customer' %})
 
 **All 15 homepage sections now ported.** (trust-numbers is also built but is not on the 9.0.0 homepage.)
+
+## Phase 17 — Brass palette finalized ✅ (2026-06-01)
+**Reverted the Phase 3/4 AA-darkening** back to the brand brass. The tentative darkening of accent text on
+cream (`#d8ae82`/`#bc843f` → `#8f5e2c`/`#a05f1f`) was undone: brand brass **`#bc843f`** is restored across
+`templates/index.json` + every section schema default, and **`#8f5e2c` is now entirely removed** from the
+codebase. The buff **`#d8ae82`** was consolidated — on **light** backgrounds it becomes brass `#bc843f`
+(collections-grid metal label, three-sacred-metals lines); it survives **only as the "brass-on-dark" shade**
+on dark sections (where `#bc843f` ≈ 2.8:1 is unreadable, vs buff ≈ 4.5:1). Conscious decision: `#bc843f` accent
+text on cream sits ~3:1 (below AA-small) but is kept — it's the canonical brand brass and stock Impulse uses it
+(sale tags, save price). Code-quality kept from the contrast pass: standard `line-clamp` fallback in
+collections-grid + STOCK-MATCH font-weights hardened into the base `.t-*` rules (no longer an order-dependent
+override). Files: `templates/index.json`, `assets/kw-typography.css`, `assets/kw-tokens.css`, `BRAND.md`,
+`sections/{collections-grid,three-sacred-metals,…}.liquid`. Committed `d99d81a`.
+
+## Phase 18 — Theme-dev workflow tooling ✅ (2026-06-01)
+Added the missing discipline for the **live dev theme** (admin "Customize" edits kept vanishing). New
+`docs/THEME-DEV-WORKFLOW.md` (the one-way-push + ~7-day auto-delete traps + the fix) and Windows-native
+`scripts/theme-{dev,pull,push}.ps1` + `theme.config.example.ps1` (pin a persistent theme, two-way
+`--theme-editor-sync`, `--nodelete`). `CLAUDE.md` reconciled with reality: stale branch → **`main`**, naming
+rule now points at `section-manifest.json` (`owner:custom`) as the source of truth (no file renames), and a new
+"Theme dev workflow" section. `.gitignore` gains `.env` + the machine-local `scripts/theme.config.ps1`. No
+storefront/code changes. Committed `4752cf1`.
+
+## Phase 19 — Docs front-door + currency pass ✅ (2026-06-01)
+Replaced the broken UTF-16 stub `README.md` with a proper UTF-8 front door (overview, "start here" table, a
+grouped index of every doc, the `kw` layer, dev quick-start). Audited all docs vs Phases 17–18 and updated the
+stale ones — `DESIGN-AUDIT.md` + `ACCESSIBILITY.md` brass-darkening notes → brass-kept; `DEPLOY.md` cross-link
+to the dev-workflow guide + section list now defers to `section-manifest.json`.

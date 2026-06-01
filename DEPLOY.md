@@ -2,6 +2,10 @@
 
 > How to push changes to Shopify safely, and how to take an Impulse version update without losing the custom layer.
 > Conventions: [CLAUDE.md](CLAUDE.md). Port history: [MIGRATION-LOG.md](MIGRATION-LOG.md).
+>
+> **For day-to-day dev** (running the dev server + keeping admin "Customize" edits from vanishing), use
+> [docs/THEME-DEV-WORKFLOW.md](docs/THEME-DEV-WORKFLOW.md) + the `scripts/theme-*.ps1` helpers. This file covers
+> **one-off pushes** (after a code review / fix).
 
 ## Targets
 - **Store:** `kansawalasmf` · **Development (Draft) theme:** `152401707182` (unpublished — safe to push to).
@@ -31,8 +35,9 @@ changes apply to all instances on push.)
 ## The custom layer (what's "ours" vs stock)
 Everything custom is **additive & namespaced** so it survives an Impulse base update:
 - **New assets:** `assets/kw-tokens.css`, `assets/kw-typography.css` · **New snippet:** `snippets/kw-fonts.liquid`
-- **New sections:** `hero-slider`, `marquee-strip`, `collections-grid`, `global-presence`, `trust-numbers`,
-  `heritage-timeline` (`.liquid`) — all `kw-*` classes / `--d/--s/--fs-*` tokens / `.t-*` utilities.
+- **New sections:** the custom homepage sections (hero-slider, collections-grid, bestsellers, three-sacred-metals,
+  … — the authoritative list is `section-manifest.json` entries with `"owner": "custom"`), all using `kw-*`
+  classes / `--d/--s/--fs-*` tokens / `.t-*` utilities.
 - **Docs + config:** `BRAND/COMPONENTS/DESIGN-AUDIT/MIGRATION-LOG/SEO/PERFORMANCE/ACCESSIBILITY/DEPLOY.md`,
   `section-manifest.json`, `.theme-check.yml` (local dev-tooling — **not** a theme asset, not pushed).
 - **Edits to stock files (the only 2):**

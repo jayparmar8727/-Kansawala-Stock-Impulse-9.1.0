@@ -84,9 +84,10 @@ image fallback).
 - **`max_blocks: 12`** — caps the (doubled) DOM for the seamless loop.
 - **Punctuation** — default separator `|` → `·` (middot); preset `Eco-Friendly & Sustainable` → `and`.
 
-### Noted — not changed (brand/merchant decision)
-- **Contrast** — text `#d8ae82` on `#6b3c23` ≈ 3.3:1 (below AA 4.5:1 at 14/12px). Left as-is — it's the
-  established brand palette (same buff-on-brown as the hero); changing it is a brand call.
+### Noted — brand decision (resolved in MIGRATION-LOG Phase 17)
+- **Contrast** — text `#d8ae82` on `#6b3c23` ≈ 3.3:1 (below AA 4.5:1 at 14/12px). **Resolved as a conscious
+  brand decision:** the brand brass is kept, and `#d8ae82` is the readable "brass-on-dark" shade for exactly
+  these dark-bg accents. See BRAND.md + MIGRATION-LOG Phase 17.
 - No visible pause control added (consistent with the hero — merchant preference; reduced-motion + hover-pause remain).
 - Optional polish deferred: editor anchor when `show_section=false`, mobile gap scaling, `will-change`.
 
@@ -107,9 +108,10 @@ Schema valid (`max_blocks: 12`, no dup IDs); Liquid balanced; `shopify theme che
 - **Editor empty-state** — `request.design_mode` hint when a section has no cards.
 - **Typography** — `Ayurveda's` → `Ayurveda’s` (curly); aligned schema card defaults (`For Eating`/`Kansa Bronze`
   → `Eating`/`Kansa`) to the preset; `-webkit-line-clamp: 2 → 1` for short names.
-- **Contrast (brand-colour change — approved)** — metal label `#d8ae82 → #8f5e2c` and eyebrow
-  `#bc843f → #a05f1f` to pass AA on the `#faf5ee` cream (metal was ~1.74:1 — near-invisible). Heading-italic
-  accent left on the brand brass (large text).
+- **Contrast (Phase 3 darkening — REVERTED in Phase 17)** — this pass tentatively darkened the metal label
+  (`#d8ae82 → #8f5e2c`) + eyebrow (`#bc843f → #a05f1f`) for AA on cream. **Later reverted to the brand brass
+  `#bc843f`** (merchant prefers it; stock Impulse uses it too). The metal label — near-invisible buff before —
+  now renders in brass `#bc843f` (more legible than `#d8ae82`, accepted below-AA-small). `#8f5e2c` is gone.
 
 ### Verified clean
 Schema valid (`max_blocks: 12`, no dup IDs); Liquid balanced (2 `liquid` tags, if/for balanced);

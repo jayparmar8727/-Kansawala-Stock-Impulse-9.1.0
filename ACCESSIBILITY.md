@@ -31,11 +31,13 @@
 ## Contrast policy
 Targets: **4.5:1** small text, **3:1** large (≥24px or ≥18.66px bold) & UI/non-text.
 - Core readable text (hero heading/body, collection/global-presence headings, trust labels) meets **AA/AAA** —
-  some were deliberately darkened (`#d8ae82→#8f5e2c`, `#bc843f→#a05f1f`) on cream. See DESIGN-AUDIT.
-- **Intentional exceptions:** small buff `#d8ae82` accents on dark brown (~3.2:1, e.g. hero eyebrow, marquee text)
-  are a **conscious brand decision**, not an oversight — flagged here so it's a known, owned trade-off.
-- **Merchants:** when changing colours in the Customizer, keep text ≥ 4.5:1 against its background. Safe pairings:
-  cream `#faf5ee` bg → use `#6b3c23`/`#8f5e2c`; brown `#6b3c23` bg → use `#fee8d9`/`#faf5ee`.
+  set in kansa brown `#6b3c23` (on cream) / cream `#fee8d9`/`#faf5ee` (on brown).
+- **Intentional exceptions (conscious brand decision, owned trade-off):** the brand brass is used for small
+  **accent** text (eyebrows, labels, heading-italics) and sits below AA-small — `#bc843f` on cream ≈ 3:1, and
+  its dark-bg shade buff `#d8ae82` on brown ≈ 3.2:1. Kept because it's the canonical brand brass (stock Impulse
+  uses `#bc843f` the same way for sale tags / save price). See BRAND.md + MIGRATION-LOG Phase 17.
+- **Merchants:** when changing colours in the Customizer, keep **body** text ≥ 4.5:1. Safe pairings: cream
+  `#faf5ee` bg → use `#6b3c23`; brown `#6b3c23` bg → use `#fee8d9`/`#faf5ee`.
 
 ## Motion policy
 - Everything animated respects `prefers-reduced-motion` (global floor + JS gates) → content **snaps in**, never
