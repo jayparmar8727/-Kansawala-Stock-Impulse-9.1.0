@@ -33,9 +33,14 @@ from the stock baseline.
 
 ## Naming conventions (custom code)
 
-- New custom sections: `custom-<name>.liquid` (e.g. `custom-promo-banner.liquid`).
-- New custom snippets: `custom-<name>.liquid`.
-- This makes `git ls-files sections | grep custom-` a reliable "what did we add" list.
+- **`section-manifest.json` is the source of truth** for what's custom: each entry has
+  `"owner": "custom"` or `"owner": "stock"`. Check it (not the filename) to tell them apart.
+- Prefer a `kw-` or `custom-` prefix for **new** custom files (e.g. `kw-newsletter.liquid`,
+  `custom-promo-banner.liquid`) so they're obvious at a glance.
+- Some existing custom files are unprefixed — sections `hero-slider`, `marquee-strip`, `collections-grid`,
+  `global-presence`, `heritage-timeline`, `trust-numbers`, and snippet `kw-fonts.liquid`. **Do NOT rename
+  them** — they're referenced by filename in `templates/index.json`, `section-manifest.json`, and
+  `layout/theme.liquid`; renaming would break the storefront. They're tracked as custom via the manifest.
 - Do **not** rename or repurpose existing stock files; create new ones instead.
 
 ## Protected / high-risk files — extra care
@@ -55,7 +60,8 @@ from the stock baseline.
 
 ## Section authoring checklist (new section)
 
-1. Create `sections/custom-<name>.liquid` with a `{% schema %}` block.
+1. Create `sections/kw-<name>.liquid` (or `custom-<name>.liquid`) with a `{% schema %}` block, and register
+   it in `section-manifest.json` with `"owner": "custom"`.
 2. Add a `presets` entry so it appears in the theme editor.
 3. Add any new translatable strings to **all** `locales/*.json` files.
 4. Do **not** edit JSON templates unless the section must appear there by default.
@@ -90,8 +96,26 @@ git diff --stat db0e1c1
 git diff --name-status db0e1c1 | grep '^A'
 ```
 
+## Theme dev workflow (local ↔ admin) — don't lose admin customizations
+
+The storefront has **two** editing surfaces: **code** (VS Code → git) and **content/settings** (Shopify
+admin "Customize"). Both render from a shared Shopify **dev theme**. Two traps make admin edits vanish:
+1. **One-way push** — bare `shopify theme dev` pushes your *local* files OVER the dev theme, clobbering
+   admin "Customize" edits.
+2. **Ephemeral theme** — a CLI Development theme auto-deletes after ~7 days of inactivity, taking
+   admin-only edits with it.
+
+Hard rules (full guide: [`docs/THEME-DEV-WORKFLOW.md`](docs/THEME-DEV-WORKFLOW.md)):
+- **Never run bare `shopify theme dev`.** Use `scripts/theme-dev.ps1` — it pins a **persistent** dev theme
+  and runs `--theme-editor-sync` (two-way), so admin edits flow back to local.
+- **Pull + commit admin edits before ending a session:** `scripts/theme-pull.ps1` (pulls
+  `config/settings_data.json`, `templates/*.json`, `sections/*-group.json`), then `git commit` — else the
+  edits are lost when the dev theme changes/expires.
+- **Split by tool:** code in VS Code; content/settings in admin.
+
 ## Git / branch rules
 
-- Develop on branch `claude/eloquent-sagan-U602E`.
+- Develop on `main` (the project's working branch). Use a short-lived `claude/<topic>` branch only for
+  isolated/risky work, then merge back to `main`.
 - Commit with clear messages stating **stock vs custom** intent.
-- Push with `git push -u origin <branch>`. Do not open PRs unless asked.
+- Push with `git push -u origin <branch>` (or `main`). Do not open PRs unless asked.
