@@ -11,8 +11,8 @@
 |---|---|---|
 | `--W`  | `#FFFFFF` | white |
 | `--C`  | `#FEE8D9` | cream (light text on dark) |
-| `--Bu` | `#D8AE82` | buff / accent (eyebrows, dots, arrows) |
-| `--Br` | `#BC843F` | brass (primary button hover) |
+| `--Bu` | `#D8AE82` | brass on **dark** bg — lighter brass shade, keeps gold accents readable on dark sections |
+| `--Br` | `#BC843F` | brass — accent text, decorative accents, button-hover bg |
 | `--K`  | `#6B3C23` | kansa brown (primary button bg) |
 | `--Dk` | `#2A1508` | dark brown (overlays) |
 | `--off`| `#FAF5EE` | off-white surface |
@@ -64,3 +64,18 @@ Eyebrow → heading → optional italic `em` → optional body. Keep the eyebrow
 `margin-bottom: 14px`; never add `margin-top` to `.t-display em` (it already
 has `display:block`). Heading→body gap varies 12–32px per section but stays
 consistent within a file.
+
+## 8. Accessibility & stock-coupling notes
+- **The brand brass `--Br` (`#BC843F`) is used for accent text on light backgrounds** (eyebrows, labels,
+  heading-italics, etc.). It sits below WCAG AA for small text (≈3:1 vs 4.5:1) — a conscious brand choice:
+  it's the established brass, and stock Impulse itself uses `#BC843F` for Sale tags / Save price / cart lines.
+  Dark-bg sections (hero, marquee, heritage, craft) use a lighter brass (`#D8AE82` / `#E5C2A0`) for contrast.
+- **`.rte h4–h6` is the one place the KW layer reaches into Impulse internals.** It styles merchant rich-text
+  sub-headings via Impulse's own `--typeHeaderPrimary / --typeHeaderFallback / --typeHeaderWeight /
+  --typeHeaderSpacing / --typeHeaderLineHeight / --typeH3Size / --typeH3SizeMobile / --typeBaseSize` vars.
+  If a future Impulse upgrade renames or drops those `--type*` vars, re-check `assets/kw-typography.css`.
+- **`layout/theme.liquid` is modified (+5 lines)** — the `<head>` includes that load `kw-tokens.css`,
+  `kw-typography.css` and `kw-fonts.liquid`. It's the one stock file the KW layer edits; re-apply after any
+  Impulse theme update.
+- **STOCK-MATCH weights (Jost 400 + body line-height 1.4) live in the base `.t-*` rules**, not a trailing
+  override — so reordering `kw-typography.css` can't silently revert them. Cormorant accents stay 300.

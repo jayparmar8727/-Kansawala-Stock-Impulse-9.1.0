@@ -46,7 +46,7 @@
 .t-display{
   font-family: var(--d);
   font-size:   var(--fs-3xl);
-  font-weight: var(--fw-light);
+  font-weight: 400;
   letter-spacing: var(--ls-hd);
   line-height: var(--lh-tight);
   text-transform: uppercase;
@@ -57,7 +57,7 @@
 .t-display-lg{
   font-family: var(--d);
   font-size:   var(--fs-hero);
-  font-weight: var(--fw-light);
+  font-weight: 400;
   letter-spacing: var(--ls-hd);
   line-height: var(--lh-tight);
   text-transform: uppercase;
@@ -68,7 +68,7 @@
 .t-display-sm{
   font-family: var(--d);
   font-size:   var(--fs-2xl);
-  font-weight: var(--fw-light);
+  font-weight: 400;
   letter-spacing: var(--ls-hd);
   line-height: var(--lh-tight);
   text-transform: uppercase;
@@ -94,7 +94,7 @@
 .t-heading{
   font-family: var(--d);
   font-size:   var(--fs-xl);
-  font-weight: var(--fw-light);
+  font-weight: 400;
   letter-spacing: .06em;
   line-height: var(--lh-snug);
   text-transform: uppercase;
@@ -104,7 +104,7 @@
 .t-heading-sm{
   font-family: var(--d);
   font-size:   var(--fs-lg);
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: .04em;
   line-height: var(--lh-snug);
   text-transform: uppercase;
@@ -136,7 +136,7 @@
 .t-card-title{
   font-family: var(--d);
   font-size:   var(--fs-xl);
-  font-weight: var(--fw-light);
+  font-weight: 400;
   letter-spacing: .06em;
   line-height: var(--lh-snug);
   text-transform: uppercase;
@@ -248,7 +248,7 @@
   font-size:   var(--fs-base);
   font-weight: 400;
   letter-spacing: normal;
-  line-height: var(--lh-base);
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -257,7 +257,7 @@
   font-size:   var(--fs-md);
   font-weight: 400;
   letter-spacing: normal;
-  line-height: var(--lh-base);
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -266,7 +266,7 @@
   font-size:   var(--fs-sm);
   font-weight: 400;
   letter-spacing: normal;
-  line-height: var(--lh-base);
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -372,16 +372,10 @@
   .rte h4 { font-size: var(--typeH3Size); }
 }
 
-/* ─── STOCK-MATCH (2026-05-31) ─────────────────────────────────────────
-   Align KW headings + body to the stock Jost scale for cross-page
-   consistency (stock H1/H2 = Jost 400; body 16/22 ≈ lh 1.375):
-   • headings Jost 400 (was --fw-light 300) — uppercase + Cormorant
-     italic accent (.t-display em) intentionally kept;
-   • body line-height 1.4 (was --lh-base 1.7) to match the stock rhythm.
-   Later in the file than the base rules → same specificity, this wins. */
-.t-display, .t-display-lg, .t-display-sm,
-.t-heading, .t-heading-sm, .t-card-title { font-weight: 400; }
-.t-body, .t-body-lg, .t-body-sm { line-height: 1.4; }
-/* Cormorant serif accents (.t-display em, .t-card-title em, .t-card-title-serif*,
+/* ─── STOCK-MATCH (2026-05-31, hardened) ───────────────────────────────
+   KW headings = Jost 400 and body line-height = 1.4 (matching the stock
+   Jost scale) are now set DIRECTLY in the base rules above — NOT as a
+   trailing override — so reordering this file can't silently revert them.
+   Cormorant serif accents (.t-display em, .t-card-title em, .t-card-title-serif*,
    .t-body-serif, .t-quote, .t-stat-serif-upright) intentionally stay light/300 —
    that's the brand layer; stock has no Cormorant. */
