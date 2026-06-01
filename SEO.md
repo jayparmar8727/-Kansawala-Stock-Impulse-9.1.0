@@ -80,6 +80,10 @@ non-indexable by Shopify default. Leave as-is.
 1. ✅ **DONE — global Organization JSON-LD** (`snippets/kw-schema-organization.liquid`, rendered in `theme.liquid`
    head on `index`): name, url, `logo` (settings.logo), `sameAs` social links. *(Additive — complements the
    article-scoped `Organization` stock already emits.)*
+   - **Setup:** it auto-populates from theme settings — set the **Logo** and **social links** (Customize →
+     Theme settings → Logo / Social media), or those fields are simply omitted (the JSON stays valid either way).
+   - **Verify after deploy:** paste the homepage URL into **Google Rich Results Test** — the JSON-LD renders live
+     with the real shop data, so that's the definitive check.
 2. **Meta-description fallback** in `theme.liquid`: `page_description | default: collection.description | default:
    product.description | strip_html | truncatewords: 30 | default: shop.description`. *(1-line edit — stock file,
    minimal & reversible.)*
